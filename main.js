@@ -26,8 +26,16 @@ app.get('/countries', function (req, res) {
 app.get('/flights', function (req, res) {
   let getPromise = getRequestFlights(req.query.locale, req.query.origin, req.query.destination)
   getPromise.then(json => {
-    let flights = getFlights(json, req.query.availability)
-    res.send(flights)
+    let obj = getFlights(json, req.query.availability)
+    for (let i = 0; i < obj.promises.length; ++i) {
+      let promise = obj.promises[i]
+      promise.then(json => {
+        obj.flights[i].imgUrl = generateImgUrl(json)
+      })
+    }
+    Promise.all(obj.promises)
+      .then(() => res.send(obj.flights))
+      .catch(msg => console.log(msg))
   }).catch(reason => res.send(reason))
 })
 
@@ -36,6 +44,7 @@ function getFlights (json, availability) {
   let quotes = json["Quotes"]
   let places = createDictBy(json["Places"], "PlaceId")
   let flights = []
+  let promises = []
 
   quotes = _.sortBy(quotes, 'MinPrice')
   quotes = _.filter(quotes, (quote) => {
@@ -48,19 +57,21 @@ function getFlights (json, availability) {
     let inbound = quote["InboundLeg"]
     let origin = places[outbound["OriginId"]]["Name"]
     let destination = places[outbound["DestinationId"]]["Name"]
-    let price = quote["MinPrice"]
     flights.push({
       origin: origin,
       destination: destination,
-      price: price,
+      price: quote["MinPrice"],
       outboundDate: outbound["DepartureDate"],
       inboundDate: inbound["DepartureDate"],
-      imgUrl: "https://www.amda.edu/media/ny.jpg"
+      imgUrl: null
     })
+    let promise = getImageFor(destination)
+    promises.push(promise)
   }
 
-  return flights
+  return { flights: flights, promises: promises }
 }
+
 function getCountries (json, availability) {
   let routes = json["Routes"]
   let quotes = createDictBy(json["Quotes"], "QuoteId")
@@ -110,9 +121,6 @@ function getRequestCountries(locale, origin) {
     qs: {
       apiKey: process.env.API_KEY // -> uri + '?access_token=xxxxx%20xxxxx'
     },
-    headers: {
-      'User-Agent': 'Request-Promise'
-    },
     json: true // Automatically parses the JSON string in the response
   };
 
@@ -144,4 +152,23 @@ function createDictBy(obj, id) {
   })
 
   return ret
+}
+
+function getImageFor (city) {
+  let options = {
+    uri: 'https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=8d1b968d3b8075b564197385b9306e7a&tags=landscape%2C+' + city + '&tag_mode=all&format=json&nojsoncallback=1&auth_token=72157688006296333-6dd7f3835e03a207&api_sig=a6d051ac077ccc263fa19114aa3581f7',
+    json: true // Automatically parses the JSON string in the response
+  };
+
+  return rp(options)
+}
+
+function generateImgUrl (json) {
+  let photo = json["photos"]["photo"][0]
+  let farm_id = photo["farm"]
+  let server_id = photo["server"]
+  let id = photo["id"]
+  let secret = photo["secret"]
+
+  return "https://farm" + farm_id + ".staticflickr.com/" + server_id + "/" + id + "_" + secret + ".jpg"
 }
