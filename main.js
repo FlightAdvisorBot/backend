@@ -64,7 +64,7 @@ function getRequestFlights(locale, origin, destination) {
   let options = {
     uri: 'http://partners.api.skyscanner.net/apiservices/browsequotes/v1.0/FR/eur/' + locale + '/' + origin + '/' + destination + '/anytime/anytime',
     qs: {
-      apiKey: 'ha906464854775459164611892547937' // -> uri + '?access_token=xxxxx%20xxxxx'
+      apiKey: process.env.API_KEY // -> uri + '?access_token=xxxxx%20xxxxx'
     },
     json: true // Automatically parses the JSON string in the response
   };
@@ -77,7 +77,7 @@ function getRequestCountries(locale, origin) {
     uri: 'http://partners.api.skyscanner.net/apiservices/browseroutes/v1.0/FR/eur/{locale}/' + origin
     + '/anywhere/anytime/anytime',
     qs: {
-      apiKey: 'ha906464854775459164611892547937' // -> uri + '?access_token=xxxxx%20xxxxx'
+      apiKey: process.env.API_KEY // -> uri + '?access_token=xxxxx%20xxxxx'
     },
     headers: {
       'User-Agent': 'Request-Promise'
