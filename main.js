@@ -48,7 +48,6 @@ function getCountries (json, availability) {
     for (let i = 0; i < routeQuotes.length; ++i) {
       let quote = routeQuotes[i]
       if (quoteInAvailability(quote, availability)) return true
-      ++i
     }
     return false
   })
