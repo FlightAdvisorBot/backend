@@ -4,6 +4,12 @@ let rp = require('request-promise-native')
 let env = require('dotenv')
 let app = express()
 
+let port = process.env.port || process.env.PORT || 3000;
+
+app.listen(port, () => {
+  console.log(`Server online on port ${port}`)
+})
+
 env.load()
 
 const MAX_RECOMMENDATIONS = 3
@@ -25,8 +31,6 @@ app.get('/flights', function (req, res) {
   }).catch(reason => res.send(reason))
 })
 
-app.listen(3000)
-console.log('Server online on port 3000')
 
 function getFlights (json, availability) {
   return json
