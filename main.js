@@ -1,7 +1,10 @@
 let express = require('express')
 let _ = require('underscore')
 let rp = require('request-promise-native')
+let env = require('dotenv')
 let app = express()
+
+env.load()
 
 const MAX_RECOMMENDATIONS = 3
 
