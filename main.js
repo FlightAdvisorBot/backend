@@ -33,25 +33,33 @@ app.get('/flights', function (req, res) {
 
 
 function getFlights (json, availability) {
-  let quotes = createDictBy(json["Quotes"], "QuoteId")
+  let quotes = json["Quotes"]
   let places = createDictBy(json["Places"], "PlaceId")
   let flights = []
 
-  _.sortBy(quotes, 'MinPrice')
-  _.filter(quotes, (quote) => {
+  quotes = _.sortBy(quotes, 'MinPrice')
+  quotes = _.filter(quotes, (quote) => {
     return quoteInAvailability(quote, availability)
   })
 
   for (let i = 0; i < MAX_RECOMMENDATIONS; ++i) {
-    let route = routes[i]
-    let destination = places[route["DestinationId"]]["Name"]
-    let price = route["Price"]
-    countries.push({
+    let quote = quotes[i]
+    let outbound = quote["OutboundLeg"]
+    let inbound = quote["InboundLeg"]
+    let origin = places[outbound["OriginId"]]["Name"]
+    let destination = places[outbound["DestinationId"]]["Name"]
+    let price = quote["MinPrice"]
+    flights.push({
+      origin: origin,
       destination: destination,
       price: price,
+      outboundDate: outbound["DepartureDate"],
+      inboundDate: inbound["DepartureDate"],
       imgUrl: "https://www.amda.edu/media/ny.jpg"
     })
   }
+
+  return flights
 }
 function getCountries (json, availability) {
   let routes = json["Routes"]
@@ -59,8 +67,8 @@ function getCountries (json, availability) {
   let places = createDictBy(json["Places"], "PlaceId")
   let countries = []
 
-  _.sortBy(routes, 'Price')
-  _.filter(routes, (route) => {
+  routes = _.sortBy(routes, 'Price')
+  routes = _.filter(routes, (route) => {
     let routeQuotes = _.map(route["QuoteIds"], function (id) { return quotes[id] })
     for (let i = 0; i < routeQuotes.length; ++i) {
       let quote = routeQuotes[i]
