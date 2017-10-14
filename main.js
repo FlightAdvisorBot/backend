@@ -33,9 +33,26 @@ app.get('/flights', function (req, res) {
 
 
 function getFlights (json, availability) {
-  return json
-}
+  let quotes = createDictBy(json["Quotes"], "QuoteId")
+  let places = createDictBy(json["Places"], "PlaceId")
+  let flights = []
 
+  _.sortBy(quotes, 'MinPrice')
+  _.filter(quotes, (quote) => {
+    return quoteInAvailability(quote, availability)
+  })
+
+  for (let i = 0; i < MAX_RECOMMENDATIONS; ++i) {
+    let route = routes[i]
+    let destination = places[route["DestinationId"]]["Name"]
+    let price = route["Price"]
+    countries.push({
+      destination: destination,
+      price: price,
+      imgUrl: "https://www.amda.edu/media/ny.jpg"
+    })
+  }
+}
 function getCountries (json, availability) {
   let routes = json["Routes"]
   let quotes = createDictBy(json["Quotes"], "QuoteId")
