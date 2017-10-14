@@ -81,7 +81,7 @@ function getRequestFlights(locale, origin, destination) {
 
 function getRequestCountries(locale, origin) {
   let options = {
-    uri: 'http://partners.api.skyscanner.net/apiservices/browseroutes/v1.0/FR/eur/{locale}/' + origin
+    uri: 'http://partners.api.skyscanner.net/apiservices/browseroutes/v1.0/FR/eur/' +locale + '/' + origin
     + '/anywhere/anytime/anytime',
     qs: {
       apiKey: process.env.API_KEY // -> uri + '?access_token=xxxxx%20xxxxx'
