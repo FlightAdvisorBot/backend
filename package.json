@@ -1,0 +1,22 @@
+{
+  "name": "bot-backend",
+  "version": "1.0.0",
+  "description": "\"# bot-backend\"",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FlightAdvisorBot/backend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/FlightAdvisorBot/backend/issues"
+  },
+  "homepage": "https://github.com/FlightAdvisorBot/backend#readme",
+  "dependencies": {
+    "express": "^4.16.2"
+  }
+}
