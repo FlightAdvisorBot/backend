@@ -42,7 +42,7 @@ function getFlights (json, availability) {
     return quoteInAvailability(quote, availability)
   })
 
-  for (let i = 0; i < MAX_RECOMMENDATIONS; ++i) {
+  for (let i = 0; (i < MAX_RECOMMENDATIONS) && (i < quotes.length); ++i) {
     let quote = quotes[i]
     let outbound = quote["OutboundLeg"]
     let inbound = quote["InboundLeg"]
